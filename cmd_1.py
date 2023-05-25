@@ -53,6 +53,7 @@ def listnice(d):
     log = list(d)
     for i in log:
         print(i)
+
 def filepath(path):
     return path + "> "
 
@@ -120,7 +121,7 @@ while running:
     else:
         for i in range(len(pointers)):
             if query == pointers[i]:
-                list(file[i])
+                listnice(file[i])
                 resolve = True
         if not resolve:
             print("not found")
