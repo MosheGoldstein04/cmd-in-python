@@ -1,126 +1,126 @@
-#files
-moshe = "is the best"
-file1 = "1"
-file2 = "2"
-file3 = "3"
-file4 = "4"
-file5 = "5"
-file6 = "6"
-filepath = ['D']
-currintfolder = filepath[len(filepath)-1]
-#folders
-D = {
-    "home" : {
-        "file1":  file1,
-        "file2":  file2,
-        "file3":  file3,
-        
-        "projects": {
-            "project1": file4,
-            "project2": {
-                "file5": file5,
-            }
+
+sys = {
+   "a": {
+        "b": "hello",
+        "e": "hi",
+        "f": "hey"
         },
-    },
-    
-    "files" : {
-        "moshe":  moshe,
-        "file6":  file6,
+    "c": {
+        "d": "world",
+        "g": "bye",
+        "h": "goodbye",
+        "i": {
+            "j": {
+                "m": "fun",
+                "n": "super",
+                "o": "cool",
+            },
+            "k": {
+                "p": "nice",
+                "q": "good",
+                "r": "great",
+            },
+            "l": {
+                "s": {
+                    "t": "awesome",
+                    "u": "amazing",
+                    "v": "fantastic",
+                },
+                "w": {
+                    "x": "wow",
+                    "y": "wonderful",
+                    "z": "excellent",
+                }
+            }
+        }
     }
 }
-#init vars
-previos = []
-ECHO = True
-def filepathformat(filepath):
-    b = ''
-    for i in filepath:
-        b += '['+i+']'
-    return b
-def path(ECHO,filepath):
-    if (ECHO):
-        b = ''
-        for i in filepath:
-            b += i+"\\"
+pointers = ["sys","sys/a","sys/c","sys/a/b","sys/c/d","sys/c/i","sys/c/i/j","sys/c/i/k","sys/c/i/l","sys/c/i/l/s","sys/c/i/l/w","sys/c/i/l/s/t","sys/c/i/l/s/u","sys/c/i/l/s/v","sys/c/i/l/w/x","sys/c/i/l/w/y","sys/c/i/l/w/z"]
+file = [sys,sys["a"],sys["c"],sys["a"]["b"], sys["c"]["d"], sys["c"]["i"], sys["c"]["i"]["j"], sys["c"]["i"]["k"], sys["c"]["i"]["l"], sys["c"]["i"]["l"]["s"], sys["c"]["i"]["l"]["w"], sys["c"]["i"]["l"]["s"]["t"], sys["c"]["i"]["l"]["s"]["u"], sys["c"]["i"]["l"]["s"]["v"], sys["c"]["i"]["l"]["w"]["x"], sys["c"]["i"]["l"]["w"]["y"], sys["c"]["i"]["l"]["w"]["z"]]
+currentpath = "sys/c/i/l/w/z"
+
+
+def list(d):
+    log = []
+    try:
+        for key in d.keys():
+            log.append(key)
+        return log
+    except:
+        return ""
+    
+def listnice(d):
+    log = list(d)
+    for i in log:
+        print(i)
+def filepath(path):
+    return path + "> "
+
+def currentfolder(file,currentpath,pointers):
+    for i in range(len(pointers)):
+        if currentpath == pointers[i]:
+            return list(file[i])
+
+def breakfilepath(currentpath):
+    output = ""
+    parts = currentpath.split("/")
+    if len(parts) > 1:
+        parts.pop(len(parts) - 1)
         
-        return b[:1]+':'+b[1:]+'>'
+        for i in parts:
+            output += i
+            output += "/"
+        return output.rstrip(output[-1])
     else:
-        return ''
-#commands
-def dir(a,D, currintfolder):
-    for items in currintfolder.items():
-        print(items)
+        return currentpath
 
-def cd(a, path):
-        return a[3:]
+running = True
+while running:
+    resolve = False
+    query = input(filepath(currentpath))
+    
+    if query == "x":
+        running = False
+        resolve = True
+    
+    elif query.startswith("newdir "):
 
-def mkdir(a):
-############################################
-    D[a[:6:]] = ''
-############################################
-def echo(a, ECHO):
-    if (a[5:] == "off"):
-        print("ECHO is off")
-        return False
-    elif (a[5:] == "on"):
-        print("ECHO is on")
-        return True
-    elif (a == "echo"):
-        if (ECHO):
-            print("ECHO is on")
-            return True
+        sys[query[7:]] = {}
+        pointers.append(currentpath + "/" + query[7:])
+        print(pointers)
+
+    elif query == "pointers":
+        print(pointers)
+        resolve = True
+
+    elif query == "cd..":
+        currentpath = breakfilepath(currentpath)
+        resolve = True
+
+    elif query.startswith("cd "):
+        if query[3:] in currentfolder(file,currentpath,pointers):
+            currentpath += "/" + query[3:]
         else:
-            print("ECHO is off")
-            return False
+            print("not found")
+        resolve = True 
+
+    elif query == "":
+        resolve = True
+
+    elif query == "dir":
+        directorys = currentfolder(file, currentpath, pointers)
+        for i in directorys:
+            print(i)
+    elif query.startswith("list "):
+        if query[5:] in currentfolder(file,currentpath,pointers):
+            print(isinstance((currentfolder(file,currentpath,pointers)), str))
+            print(currentfolder(file,currentpath,pointers))
+        else:
+            print("not found")
     else:
-        print(a[5:])
-        return ECHO
-
-
-def commands(path, previos, ECHO, currintfolder, D):
-    while True:
-        currintfolder = filepath[len(filepath)-1]
-        a = input(path(ECHO, filepath)).lower()
-        previos += [a]
-        if (a == "dir"):
-            dir(a, D, currintfolder)
-        elif (a.startswith("cd ")):
-            if (a[3:] in D.keys()):
-                filepath.append(cd(a, path))
-            elif (a[3:] not in currintfolder.keys()):
-                print("Folder not found")
-            elif (a[3:] == ".."):
-                filepath.pop(len(filepath)-1)
-        elif(a.startswith("mkdir ")):
-            mkdir(a)
-        elif(a == "prv"):
-            print(previos)
-        elif(a == "exit"):
-            break
-        elif(a == ''):
-            continue
-        elif(a == "help"):
-            print("\n")
-            print("dir - list folders")
-            print("cd - change directory")
-            print("mkdir - create folder")
-            print("prv - print previous commands")
-            print("exit - exit application")
-            print("help - print help")
-            print("echo  - Displays messages, or turns file path on or off")
-            print("currintfolder - print current folder")
-            print("filepath - print file path in the form of a list")
-            print("\n")
-        elif(a.startswith("echo")):
-            ECHO = echo(a, ECHO)
-        elif(a == "filepath"):
-            print(filepath)
-        elif(a == "currintfolder"):
-            print(currintfolder)
-        elif(a == "filepathformat"):
-            print(filepathformat(filepath))
-        else:
-            print( "'"+a+"'"+' is not recognized as an internal or external command, operable program or batch file.')
-
-
-
-commands(path, previos, ECHO, currintfolder, D)
+        for i in range(len(pointers)):
+            if query == pointers[i]:
+                list(file[i])
+                resolve = True
+        if not resolve:
+            print("not found")
